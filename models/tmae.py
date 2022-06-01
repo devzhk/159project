@@ -3,10 +3,10 @@ import torch.nn as nn
 import numpy as np
 
 from utils.helper import LogEntry
-from distributions import Normal
+from .distributions import Normal
 
 
-class TVAE(nn.Module):
+class TMAE(nn.Module):
     """
     This is a modified version of the BaseSequentialModel class created by
     Jennifer Sun located at https://github.com/neuroethology/TREBA/

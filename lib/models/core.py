@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
 
-from utils.helper import LogEntry
-from .distributions import Normal
+from util.logging import LogEntry
+from lib.distributions import Normal
 
 
 class BaseSequentialModel(nn.Module):
+
     model_args = []
     requires_labels = False
     is_recurrent = True
@@ -19,7 +20,7 @@ class BaseSequentialModel(nn.Module):
         # Assert rnn_dim and num_layers are defined if model is recurrent
         if self.is_recurrent:
             if 'rnn_dim' not in self.model_args:
-                self.model_args.append('rnn_dim')
+                self.model_args.append('rnn_dim') 
             if 'num_layers' not in self.model_args:
                 self.model_args.append('num_layers')
 
@@ -30,10 +31,10 @@ class BaseSequentialModel(nn.Module):
         # Check for missing arguments
         missing_args = set(self.model_args) - set(model_config)
         assert len(missing_args) == 0, 'model_config is missing these arguments:\n\t{}'.format(', '.join(missing_args))
-
+        
         self.config = model_config
         self.log = LogEntry()
-        self.stage = 0  # some models have multi-stage training
+        self.stage = 0 # some models have multi-stage training            
 
         self._construct_model()
         self._define_losses()
@@ -70,12 +71,13 @@ class BaseSequentialModel(nn.Module):
 
         return hiddens
 
+
     def encode(self, states, actions=None, labels=None):
         enc_birnn_input = states
         if actions is not None:
             assert states.size(0) == actions.size(0)
             enc_birnn_input = torch.cat([states, actions], dim=-1)
-
+        
         hiddens, _ = self.enc_birnn(enc_birnn_input)
         avg_hiddens = torch.mean(hiddens, dim=0)
 
@@ -94,7 +96,7 @@ class BaseSequentialModel(nn.Module):
         if actions is not None:
             assert states.size(0) == actions.size(0)
             enc_birnn_input = torch.cat([states, actions], dim=-1)
-
+        
         hiddens, _ = self.enc_birnn(enc_birnn_input)
         avg_hiddens = torch.mean(hiddens, dim=0)
 
@@ -106,7 +108,7 @@ class BaseSequentialModel(nn.Module):
         enc_mean = self.enc_mean(enc_h)
         enc_logvar = self.enc_logvar(enc_h)
 
-        return enc_mean, hiddens
+        return enc_mean, hiddens     
 
     def decode_action(self, state):
         dec_fc_input = torch.cat([state, self.z], dim=1)
@@ -128,7 +130,7 @@ class BaseSequentialModel(nn.Module):
         if self.requires_labels:
             assert labels is not None
             assert labels.size(-1) == self.config['label_dim']
-
+    
             if z is not None:
                 assert labels.size(0) == z.size(0)
 
@@ -140,12 +142,13 @@ class BaseSequentialModel(nn.Module):
             assert num_samples > 0
             assert device is not None
             z = torch.randn(num_samples, self.config['z_dim']).to(device)
-
+        
         self.z = z
         self.temperature = temperature
 
         if self.is_recurrent:
             self.hidden = self.init_hidden_state(batch_size=z.size(0)).to(z.device)
+
 
     def act(self, state, sample=True):
         action_likelihood = self.decode_action(state)
@@ -158,8 +161,8 @@ class BaseSequentialModel(nn.Module):
 
     def prepare_stage(self, train_config):
         self.stage += 1
-        self.init_optimizer(train_config['learning_rate'])
-        self.clip_grad = lambda: nn.utils.clip_grad_norm_(self.parameters(), train_config['clip'])
+        self.init_optimizer(train_config['learning_rate']) 
+        self.clip_grad = lambda : nn.utils.clip_grad_norm_(self.parameters(), train_config['clip'])
 
     def init_optimizer(self, lr, l2_penalty=0.0):
         self.optimizer = torch.optim.Adam(
