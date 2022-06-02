@@ -25,6 +25,11 @@ def run_epoch(data_loader, model, device, train=True, early_break=False):
     for batch_idx, (states, actions, labels_dict) in enumerate(data_loader):
         states = states.to(device)
         actions = actions.to(device)
+        if random.random() < 0.5:
+            (B, T, D) = states.shape
+            states = torch.flip(states.reshape(B, T, 2, D // 2), dims=[2]).reshape(B, T, D)
+            (B, T, D) = actions.shape
+            actions = torch.flip(states.reshape(B, T, 2, D // 2), dims=[2]).reshape(B, T, D)
         # state_dim = model.config['state_dim']
         # if model.config['state_dim'] != data_loader.dataset.state_dim:
         #     states = states[:, :, :state_dim]

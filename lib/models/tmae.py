@@ -234,7 +234,7 @@ class TMAE(BaseSequentialModel):
         label_ohe.scatter_(-1, labels.unsqueeze(-1), 1)
         return label_ohe
 
-    def forward(self, states, actions, labels_dict, reconstruct=False):
+    def forward(self, states, actions, labels_dict):
         self.log.reset()
         masked_state_dim = self.config['masked_state_dim']  # masked state dim, only for encoder
         masked_action_dim = self.config['masked_action_dim']  # masked action dim, only for encoder

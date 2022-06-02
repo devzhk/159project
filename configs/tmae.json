@@ -23,10 +23,10 @@
         "decoding_loss_weight": 0.0
     },
     "train_config": {
-        "batch_size": 128,
+        "batch_size": 256,
         "checkpoint_freq": 999,
         "learning_rate": 0.0002,
-        "num_epochs": [100, 300],
+        "num_epochs": [300],
         "clip": 10
     }
 }
