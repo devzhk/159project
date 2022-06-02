@@ -1,8 +1,9 @@
 from .treba_model import TREBA_model
-
+from .tmae import TMAE
 
 model_dict = {
-    'treba_model' : TREBA_model              
+    'treba_model' : TREBA_model,
+    'tmae': TMAE
 }
 
 

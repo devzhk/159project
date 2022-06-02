@@ -1,0 +1,32 @@
+{
+    "data_config": {
+        "name": "mouse_v1",
+        "compute_svd": 5,
+        "augmentations": [
+        {
+               "name": "all_random"
+            }
+    ]
+    },
+    "model_config": {
+        "name": "tmae",
+        "state_dim": 18,
+        "action_dim": 18,
+        "masked_state_dim": 9,
+        "masked_action_dim": 9,
+        "z_dim": 32,
+        "h_dim": 256,
+        "rnn_dim": 256,
+        "num_layers": 1,
+        "contrastive_loss_weight": 10,
+        "consistency_loss_weight": 0.0,
+        "decoding_loss_weight": 0.0
+    },
+    "train_config": {
+        "batch_size": 128,
+        "checkpoint_freq": 999,
+        "learning_rate": 0.0002,
+        "num_epochs": [100, 300],
+        "clip": 10
+    }
+}

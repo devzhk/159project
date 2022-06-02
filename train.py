@@ -25,6 +25,10 @@ def run_epoch(data_loader, model, device, train=True, early_break=False):
     for batch_idx, (states, actions, labels_dict) in enumerate(data_loader):
         states = states.to(device)
         actions = actions.to(device)
+        # state_dim = model.config['state_dim']
+        # if model.config['state_dim'] != data_loader.dataset.state_dim:
+        #     states = states[:, :, :state_dim]
+        #     actions = actions[:, :, :state_dim]
         labels_dict = {key: value.to(device) for key, value in labels_dict.items()}
 
         batch_log = model(states, actions, labels_dict)
@@ -65,8 +69,9 @@ def start_training(save_path, data_config, model_config, train_config, device, t
     summary['dataset'] = dataset.summary
 
     # Add state and action dims to model config
-    model_config['state_dim'] = dataset.state_dim
-    model_config['action_dim'] = dataset.action_dim
+    if 'state_dim' not in model_config:
+        model_config['state_dim'] = dataset.state_dim
+        model_config['action_dim'] = dataset.action_dim
 
     # Get model class
     model_class = get_model_class(model_config['name'].lower())
