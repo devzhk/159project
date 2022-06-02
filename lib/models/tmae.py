@@ -234,7 +234,7 @@ class TMAE(BaseSequentialModel):
         label_ohe.scatter_(-1, labels.unsqueeze(-1), 1)
         return label_ohe
 
-    def forward(self, states, actions, labels_dict):
+    def forward(self, states, actions, labels_dict, reconstruct=False):
         self.log.reset()
         masked_state_dim = self.config['masked_state_dim']  # masked state dim, only for encoder
         masked_action_dim = self.config['masked_action_dim']  # masked action dim, only for encoder
@@ -275,7 +275,7 @@ class TMAE(BaseSequentialModel):
             posterior = self.encode(states[:-1, :, :masked_state_dim],
                                     actions=actions[:, :, :masked_action_dim],
                                     labels=labels)
-
+            embedding = posterior.mean
             kld = Normal.kl_divergence(posterior, free_bits=0.0).detach()
             self.log.metrics['kl_div_true'] = torch.sum(kld)
 
@@ -284,9 +284,9 @@ class TMAE(BaseSequentialModel):
 
             # Decode
             self.reset_policy(labels=labels, z=posterior.sample())
-            # if reconstruct:
-            #     curr_state = states[0]
-            #     reconstructed = [curr_state]
+            if reconstruct:
+                curr_state = states[0]
+                reconstructed = [curr_state]
 
             for t in range(actions.size(0)):
                 action_likelihood = self.decode_action(states[t])
@@ -294,6 +294,9 @@ class TMAE(BaseSequentialModel):
 
                 if self.is_recurrent:
                     self.update_hidden(states[t], actions[t])
+                if reconstruct:
+                    curr_state = curr_state + action_likelihood.sample()
+                    reconstructed.append(curr_state)
 
             # Add decoding loss.
             if self.loss_params['decoding_loss_weight'] > 0: 
@@ -413,6 +416,8 @@ class TMAE(BaseSequentialModel):
                             base_temperature = self.loss_params['contrastive_base_temperature'],
                             loss_weight = self.loss_params['contrastive_loss_weight'])
 
+        if reconstruct:
+            return self.log, torch.stack(reconstructed), embedding
 
         return self.log
 

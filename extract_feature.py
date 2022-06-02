@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 from torch.utils.data import DataLoader
-from utils.data.base import MouseV1Dataset
+from util.datasets import load_dataset
 from models import get_model_class
 
 
@@ -33,7 +33,7 @@ def extract_features(exp_dir,
     if test_name is not None:
         data_config["test_name"] = test_name
 
-    dataset = MouseV1Dataset(data_config)
+    dataset = load_dataset(data_config)
     dataset.eval()
 
     # Load best model

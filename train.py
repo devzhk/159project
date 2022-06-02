@@ -29,7 +29,7 @@ def run_epoch(data_loader, model, device, train=True, early_break=False):
             (B, T, D) = states.shape
             states = torch.flip(states.reshape(B, T, 2, D // 2), dims=[2]).reshape(B, T, D)
             (B, T, D) = actions.shape
-            actions = torch.flip(states.reshape(B, T, 2, D // 2), dims=[2]).reshape(B, T, D)
+            actions = torch.flip(actions.reshape(B, T, 2, D // 2), dims=[2]).reshape(B, T, D)
         # state_dim = model.config['state_dim']
         # if model.config['state_dim'] != data_loader.dataset.state_dim:
         #     states = states[:, :, :state_dim]
