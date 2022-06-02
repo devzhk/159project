@@ -346,8 +346,9 @@ class TMAE(BaseSequentialModel):
 
                     augmented_states = augmented_states.transpose(0,1)
                     augmented_actions = augmented_actions.transpose(0,1)                    
-                    aug_posterior = self.encode(augmented_states[:-1], actions=augmented_actions, 
-                                        labels=labels)
+                    aug_posterior = self.encode(augmented_states[:-1, :, :masked_state_dim],
+                                                actions=augmented_actions[:, :, :masked_action_dim],
+                                                labels=labels)
 
                     kld = Normal.kl_divergence(aug_posterior, free_bits=0.0).detach()
                     self.log.metrics['{}_kl_div_true'.format(aug.name)] = torch.sum(kld)

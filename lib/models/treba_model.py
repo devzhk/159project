@@ -232,7 +232,7 @@ class TREBA_model(BaseSequentialModel):
         label_ohe.scatter_(-1, labels.unsqueeze(-1), 1)
         return label_ohe
 
-    def forward(self, states, actions, labels_dict):
+    def forward(self, states, actions, labels_dict, recurrent=False):
         self.log.reset()
 
         # Consistency and decoding loss need labels.
@@ -267,6 +267,7 @@ class TREBA_model(BaseSequentialModel):
         # Train TVAE with programs.
         elif self.stage >= 2 or not self.loss_params['consistency_loss_weight'] > 0:
             # Encode
+            curr_state = []
             posterior = self.encode(states[:-1], actions=actions, labels=labels)
 
             kld = Normal.kl_divergence(posterior, free_bits=0.0).detach()
