@@ -236,7 +236,7 @@ class TMAE(BaseSequentialModel):
 
     def forward(self, states, actions, labels_dict, reconstruct=False):
         self.log.reset()
-        masked_state_dim = self.config['masked_state_dim']  # masked state dim, only for encoder
+        masked_state_dim = self.config['masked_state_dim']    # masked state dim, only for encoder
         masked_action_dim = self.config['masked_action_dim']  # masked action dim, only for encoder
 
         # Consistency and decoding loss need labels.
@@ -244,7 +244,7 @@ class TMAE(BaseSequentialModel):
             self.loss_params['decoding_loss_weight'] > 0):
             assert len(labels_dict) > 0
 
-        assert actions.size(1)+1 == states.size(1) # final state has no corresponding action
+        assert actions.size(1)+1 == states.size(1)          # final state has no corresponding action
         states = states.transpose(0,1)
         actions = actions.transpose(0,1)
 
